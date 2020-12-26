@@ -1,4 +1,16 @@
 const path = require('path');
+const express = require("express");
+const app = express();
+const db = require('./config/keys').mongoURI;
+const mongoose = require('mongoose');
+const users = require("./routes/api/users");
+const tweets = require("./routes/api/tweets");
+const bodyParser = require('body-parser');
+const User = require('./models/User');
+const passport = require('passport');
+
+app.use(passport.initialize());
+require('./config/passport')(passport);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('frontend/build'));
@@ -6,21 +18,6 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
   })
 }
-
-
-const express = require("express");
-const app = express();
-const db = require('./config/keys').mongoURI;
-const mongoose = require('mongoose');
-
-const users = require("./routes/api/users");
-const tweets = require("./routes/api/tweets");
-
-const bodyParser = require('body-parser');
-
-const User = require('./models/User');
-
-const passport = require('passport');
 
 mongoose
   .connect(db, { 
@@ -41,14 +38,11 @@ app.get("/", (req, res) => {
     res.send('Hello World');
 });
 
-app.use(passport.initialize());
-require('./config/passport')(passport);
 
 
 app.use(bodyParser.urlencoded({
     extended: false
 }));
-    
 app.use(bodyParser.json());
     
     
